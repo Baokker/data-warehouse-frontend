@@ -1,3 +1,4 @@
+<!-- eslint-disable no-unused-vars -->
 <!-- eslint-disable vue/singleline-html-element-content-newline -->
 <!-- eslint-disable vue/max-attributes-per-line -->
 <!-- eslint-disable vue/require-v-for-key -->
@@ -56,7 +57,6 @@
         </el-tabs>
       </el-col>
     </el-row>
-    <el-divider />
   </div>
 </template>
 
@@ -105,3 +105,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+  .el-divider--vertical{
+    height:75vh;
+  }
+</style>
