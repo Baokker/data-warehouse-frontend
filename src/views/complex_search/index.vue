@@ -59,7 +59,6 @@
 import { getList } from "@/api/table";
 
 export default {
-  name: "ComplexSearch",
   filters: {
     statusFilter(status) {
       const statusMap = {

@@ -77,6 +77,7 @@ export default {
         score: 2.5,
         commentNum: 100,
       },
+      test:"嘻嘻",
     };
   },
 
