@@ -46,9 +46,14 @@ export default {
       }).then(res => {
 
       }).catch(err => {
-        
+
       })
     },
-  },
-};
+    test() {
+      this.$axios.get("/spark/bytime/year", { params: { year: 2008 } });
+      this.$axios.get("/mysql/bytime/year", { params: { year: 2008 } });
+      this.$axios.get("/neo4j/bytime/year", { params: { year: 2008 } });
+    },
+  }
+}
 </script>
