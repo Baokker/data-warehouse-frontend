@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Message } from "element-ui";
 
-let BASE_URL = "http://81.68.102.171:5000/api/";
+let BASE_URL = "http://81.68.102.171:5000/test/";
 
 // create an axios instance
 const my_axios = axios.create({

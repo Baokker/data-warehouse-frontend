@@ -1,5 +1,5 @@
 <template>
-  <el-button @click.native="test()">点击发送</el-button>
+  <el-button @click="testpost()">点击发送POST和GET</el-button>
 </template>
 
 <script>
@@ -10,8 +10,44 @@ export default {
     return {};
   },
   methods: {
-    test() {
-      this.$axios.get("/bytime/year", { params: { year: 2008 } });
+    testpost() {
+      // post方法
+      this.$axios.post("/post", {
+        data: {
+          title: "harry",
+          date: {
+            year: 2022,
+            month: 11,
+            day: 23
+          },
+          "director": "",
+          actor: "",
+          genre: "",
+          "score": {
+            min: 2,
+            max: 4,
+          },
+          columns: ["title", "asin", "score"],
+        }
+      }).then(res => {
+
+      }).catch(err => {
+
+      });
+
+      // get方法
+      this.$axios.get("/get", {
+        params: {
+          date: {
+            year: 2022,
+            month: 4,
+          }
+        }
+      }).then(res => {
+
+      }).catch(err => {
+        
+      })
     },
   },
 };
