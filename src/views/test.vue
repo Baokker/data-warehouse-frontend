@@ -11,7 +11,7 @@ export default {
   },
   methods: {
     test() {
-      this.$axios.get("/bytime/year", { params: { year: 2008 } });
+      this.$axios.get("/spark/bytime/year", { params: { year: 2008 } });
     },
   },
 };

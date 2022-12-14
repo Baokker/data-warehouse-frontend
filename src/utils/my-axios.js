@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Message } from "element-ui";
 
-let BASE_URL = "http://81.68.102.171:5000/api/";
+let BASE_URL = "http://81.68.102.171:5000/";
 
 // create an axios instance
 const my_axios = axios.create({
@@ -14,6 +14,10 @@ my_axios.interceptors.request.use(
   (config) => {
     // do something before request is sent
     console.log(config);
+    if (config.url.includes("spark")) {
+      let baseURL = "http://175.24.152.204:5000/";
+      config.baseURL = baseURL;
+    }
     return config;
   },
   (error) => {
