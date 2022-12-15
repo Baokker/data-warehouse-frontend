@@ -55,7 +55,7 @@
           </el-form-item>
           <el-form-item label="评分">
             <el-input-number
-              v-model="form.score.min"
+              v-model="form.min_score"
               size="mini"
               :precision="2"
               :step="0.01"
@@ -64,7 +64,7 @@
             />
             <span style="margin-left:10px;margin-right:10px">至</span>
             <el-input-number
-              v-model="form.score.max"
+              v-model="form.max_score"
               size="mini"
               :precision="2"
               :step="0.01"
@@ -102,7 +102,7 @@
           </el-form-item>
         </el-form>
         <div style="text-align:center">
-          <el-button type="primary" size="small" style="margin-left:3vh" plain>查询</el-button>
+          <el-button type="primary" @click="search(form)" size="small" style="margin-left:3vh" plain>查询</el-button>
         </div>
       </el-col>
       <el-col :span="1">
@@ -129,10 +129,8 @@ export default {
       movieCategory:[],
       form:{
         title:"",
-        score:{
-          min:0,
-          max:5.0,
-        },
+        min_score:0,
+        max_score:5.0,
         date: {
           year: "",
           month: "",
@@ -154,6 +152,9 @@ export default {
     handleSelect(item) {
       console.log(item);
     },
+    handleClick(tab, event) {
+      console.log(tab, event);
+    },
     movieSearchSuggest(queryString, cb){//电影搜索建议，需修改
       var result=[];
       cb(result);
@@ -166,6 +167,27 @@ export default {
       var result=[];
       cb(result);
     },
+    search(form){
+      this.$axios.post("/mysql/comprehensive/movie", {
+        data: {
+          // genre_name:form.genre,
+          // min_score:form.min_score,
+          // max_score:form.max_score,
+          // columns:form.columns,
+          // title:form.title,
+          genre_name:"suspense",
+          min_score:0.5,
+          max_score:4.5,
+          page:1,
+          per_page:10,
+        }
+      }).then(res => {
+        console.log(res)
+
+      }).catch(err => {
+
+      });
+    }
   },
 };
 </script>
