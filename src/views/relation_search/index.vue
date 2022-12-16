@@ -91,16 +91,16 @@ export default {
       window.open("https:www.amazon.com/dp/" + this.dialogData.asin);
     },
     button() {
-      console.log("111");
-      axios({
-        method: "get",
-        url: "https://81.68.102.171:5000/ap/cooperation/with_actor/director",
-        params: {
-          director: "Tom McGrath",
-          time: 6,
-        },
-      }).then((res) => {
-        console.log(res);
+      this.$axios.post("/mysql/comprehensive/relation", {
+        "source": "actor",
+        "target": "actor",
+        "times": "7",
+        "name": "Oliver Hardy"
+      }).then(res => {
+        console.log(res)
+
+      }).catch(err => {
+
       });
     },
   },

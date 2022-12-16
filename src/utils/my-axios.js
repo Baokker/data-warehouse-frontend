@@ -6,7 +6,7 @@ let BASE_URL = "http://81.68.102.171:5000/";
 // create an axios instance
 const my_axios = axios.create({
   baseURL: BASE_URL,
-  timeout: 5000, // request timeout
+  timeout: 200000, // request timeout
 });
 
 // request interceptor
