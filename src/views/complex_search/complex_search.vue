@@ -174,7 +174,8 @@
       <el-col :span="10">
         <el-tabs v-model="activeName" @tab-click="handleClick">
           <el-tab-pane label="查询结果" name="search_res">
-              <el-table :data="result" stripe style="width: 100%" height="450">
+              <el-table :data="result" v-loading="isLoading"
+              element-loading-text="正在为您查询..." stripe style="width: 100%" height="450">
                 <el-table-column prop="title" label="标题" width="140" v-if="columns.title"/>
                 <el-table-column prop="date" label="上映日期" width="100" v-if="columns.date"/>
                 <el-table-column prop="score" label="评分" width="100" v-if="columns.score"/>
@@ -186,14 +187,14 @@
                     </div>
                   </template>
                 </el-table-column>
-                <el-table-column prop="formats" label="格式" width="100" v-if="columns.format">
-                  <!-- <template slot-scope="scope">
+                <el-table-column prop="formats" label="格式" width="140" v-if="columns.format">
+                  <template slot-scope="scope">
                     <div v-for="(item,index) in scope.row.formats" :key="index">
                       {{ item }}
                     </div>
-                  </template> -->
+                  </template>
                 </el-table-column>
-                <el-table-column prop="actors" label="演员" width="140" v-if="columns.actors">
+                <el-table-column prop="actors" label="演员" width="160" v-if="columns.actors">
                   <template slot-scope="scope">
                     <div v-for="(item,index) in scope.row.actors" :key="index">
                       {{ item }}
@@ -202,14 +203,28 @@
                 </el-table-column>
                 <el-table-column prop="directors" label="导演" width="140" v-if="columns.directors" >
                   <template slot-scope="scope">
-                    <div v-for="(item,index) in scope.row.actors" :key="index">
+                    <div v-for="(item,index) in scope.row.directors" :key="index">
                       {{ item }}
                     </div>
                   </template>
                 </el-table-column>
               </el-table>
+              <el-row style="text-align:center;margin-top:20px">
+                <el-pagination layout="prev, pager, next, jumper" 
+                  :current-page="currentPage"
+                  :page-size="10"
+                  :total="totalNum"
+                  @current-change="getNewPage(form)"
+                  small />
+              </el-row>
+            </el-tab-pane>
+          <el-tab-pane label="速度对比" name="speed" >
+            <!-- mysql速度：{{ mysql_speed}}
+            spark速度：{{ spark_speed}}<br>
+            下面是echart -->
+            <div id="speed" style="width: 400px;height: 400px">
+            </div>
           </el-tab-pane>
-          <el-tab-pane label="速度对比" name="speed" />
         </el-tabs>
       </el-col>
     </el-row>
@@ -218,12 +233,18 @@
 
 <script>
 const BASE_URL = "https://81.68.102.171:5000/api";
+import { onMounted } from 'vue';
 
 export default {
   name: "ComplexSearch",
   data() {
     return {
       activeName:"search_res",
+      isLoading:false,
+      totalNum:0,
+      currentPage:1,
+      mysql_speed:0,
+      spark_speed:0,
       form:{
         title:"",
         min_score:0,
@@ -254,6 +275,26 @@ export default {
       result:[],
       test:"",
     };
+  },
+
+  mounted() {
+    this.echartsInit();
+  },
+
+  watch:{//监听速度变化，重新渲染页面
+    mysql_speed:{
+        handler(newValue,oldValue){
+           this.mysql_speed=newValue;
+           this.echartsInit();
+        }
+    },
+    spark_speed:{
+        handler(newValue,oldValue){
+           this.spark_speed=newValue;
+           this.echartsInit();
+        }
+    }
+
   },
 
   methods: {
@@ -347,6 +388,7 @@ export default {
     },
 
     search(form){
+      this.isLoading=true;
       if(form.columns.length==0)
       {
         this.$message.warning('请至少输入一个条件!');
@@ -400,6 +442,160 @@ export default {
           form.day=null;
         }
 
+        for(var i in this.columns)//清空原有条件
+        {
+          this.columns[i]=false;
+        }
+
+        console.log("这是原始条件",form.columns);
+        for(var i=0;i<form.columns.length;i++)
+        {
+          this.columns[form.columns[i]]=true;
+          console.log("这是条件",form.columns[i],this.columns[form.columns[i]]);
+        }
+        
+        // //调用mysql查询电影总数
+        // this.$axios.post("mysql/count/movie", {
+        //     genre_name:form.genre,
+        //     min_score:form.min_score,
+        //     max_score:form.max_score,
+        //     title:form.title,
+        //     director:form.director,
+        //     actor:form.actor,
+        //     year:form.year,
+        //     month:form.month,
+        //     season:form.season,
+        //     weekday:form.weekday,
+        //     day:form.day,
+        //     page:1,
+        //     per_page:10,
+        // }).then(res => {
+        //   console.log("mysql总数",res.pages);
+        //   this.isLoading=false;
+        // }).catch(err => {
+        //   this.$message.error('当前mysql网络异常，请稍后再试');
+        // });
+
+        //调用mysql查询
+        this.$axios.post("/mysql/comprehensive/movie", {
+            genre_name:form.genre,
+            min_score:form.min_score,
+            max_score:form.max_score,
+            columns:form.columns,
+            title:form.title,
+            director:form.director,
+            actor:form.actor,
+            year:form.year,
+            month:form.month,
+            season:form.season,
+            weekday:form.weekday,
+            day:form.day,
+            page:1,
+            per_page:10,
+        }).then(res => {
+          console.log("这是mysql的结果",res);
+          console.log("data",res.data);
+          this.result = res.data;
+          console.log(this.result);
+          if(this.columns["title"]==true)
+          {
+            for(var i=0;i<this.result.length;i++)
+            {
+              console.log("标题",this.result[i].title);
+              this.result[i].title=this.result[i].title.replace(/\"/g,"");
+              console.log("标题后",this.result[i].title);
+            }
+          }
+          this.isLoading=false;
+          this.mysql_speed=res.consuming_time;
+          console.log("mysql速度",this.mysql_speed);
+        }).catch(err => {
+          this.$message.error('当前mysql网络异常，请稍后再试');
+        });
+
+        //调用hive和spark查询
+        this.$axios.post("/spark/comprehensive/movie", {
+            genre_name:form.genre,
+            min_score:form.min_score,
+            max_score:form.max_score,
+            columns:form.columns,
+            title:form.title,
+            director:form.director,
+            actor:form.actor,
+            year:form.year,
+            month:form.month,
+            season:form.season,
+            weekday:form.weekday,
+            day:form.day,
+            page:1,
+            per_page:10,
+        }).then(res => {
+          console.log("这是spark的结果",res);
+          this.totalNum=res.count;
+          this.spark_speed=res.consuming_time;
+        }).catch(err => {
+          this.$message.error('当前spark网络异常，请稍后再试');
+        });
+      }
+    },
+
+    getNewPage(form){
+      console.log("切换页面");
+      console.log("当前页数",this.currentPage);
+      this.isLoading=true;
+      if(form.columns.length==0)
+      {
+        this.$message.warning('请至少输入一个条件!');
+      }
+      else{
+        //判断年份是否为空
+        if(form.year==1930)
+        {
+          console.log("year为空");
+          form.year=null;
+          console.log(form.year);
+        }
+        else
+        {
+          console.log(form.year);
+        }
+
+        //判断月份或季度
+        if(form.month_season=="")
+        {
+          console.log("月份季度为空");
+          form.month=null;
+          form.season=null;
+        }
+        else if(form.month_season=="month")
+        {
+          console.log("选择月份");
+          form.season=null;
+        }
+        else if(form.month_season="season")
+        {
+          console.log("选择季度");
+          form.month=null;
+        }
+
+        //判断天数或星期几
+        if(form.day_weekday=="")
+        {
+          console.log("天数为空");
+          form.day=null;
+          form.weekday=null;
+        }
+        else if(form.day_weekday=="day")
+        {
+          console.log("选择天数");
+          form.weekday=null;
+        }
+        else if(form.day_weekday="weekday")
+        {
+          console.log("选择周几");
+          form.day=null;
+        }
+        console.log("这是原始条件",form.columns);
         for(var i=0;i<form.columns.length;i++)
         {
           this.columns[form.columns[i]]=true;
@@ -420,46 +616,44 @@ export default {
             season:form.season,
             weekday:form.weekday,
             day:form.day,
-            page:1,
-            per_page:5,
+            page:this.currentPage,
+            per_page:10,
         }).then(res => {
           console.log("这是mysql的结果",res);
           console.log("data",res.data);
-          this.result = JSON.parse(JSON.stringify(res.data));
-          console.log(this.result[0]);
+          this.result = res.data;
+          console.log(this.result);
+          this.isLoading=false;
         }).catch(err => {
           this.$message.error('当前mysql网络异常，请稍后再试');
         });
-
-        //调用hive和spark查询
-        this.$axios.post("/spark/comprehensive/movie", {
-            genre_name:form.genre,
-            min_score:form.min_score,
-            max_score:form.max_score,
-            columns:form.columns,
-            title:form.title,
-            director:form.director,
-            actor:form.actor,
-            year:form.year,
-            month:form.month,
-            season:form.season,
-            weekday:form.weekday,
-            day:form.day,
-            page:1,
-            per_page:5,
-        }).then(res => {
-          console.log("这是spark的结果",res);
-        }).catch(err => {
-          this.$message.error('当前spark网络异常，请稍后再试');
-        });
       }
-    }
-  },
+    },
+
+    echartsInit() {//使用时只需要把setOption里的对象换成echarts中的options或者自己的参数即可
+      console.log("开始初始化");
+      this.$echarts.init(document.getElementById('speed')).setOption({
+        title: {
+          text: '综合查询速度对比'
+        },
+        tooltip: {},
+        xAxis: {
+          data: ["mysql","spark"]
+        },
+          yAxis: {},
+          series: [{
+              name: '查询耗时',
+              type: 'bar',
+              data: [this.mysql_speed,this.spark_speed]
+          }]
+      })
+    },
+  }
 };
 </script>
 
 <style scoped>
   .el-divider--vertical{
-    height:75vh;
+    height:100vh;
   }
 </style>
