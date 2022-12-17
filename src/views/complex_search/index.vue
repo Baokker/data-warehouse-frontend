@@ -707,7 +707,7 @@ export default {
         yAxis: {},
         series: [
           {
-            name: "查询耗时",
+            name: "查询耗时(ms)",
             type: "bar",
             data: [this.mysql_speed, this.spark_speed],
           },
