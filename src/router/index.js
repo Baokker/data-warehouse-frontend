@@ -57,20 +57,20 @@ export const constantRoutes = [
     ],
   },
 
-  {
-    path: "/test",
-    component: Layout,
-    redirect: "/my-test",
-    meta: { title: "测试" },
-    children: [
-      {
-        path: "/my-test",
-        component: () => import("@/views/test"),
-        name: "Test",
-        meta: { title: "我的测试" },
-      },
-    ],
-  },
+  // {
+  //   path: "/test",
+  //   component: Layout,
+  //   redirect: "/my-test",
+  //   meta: { title: "测试" },
+  //   children: [
+  //     {
+  //       path: "/my-test",
+  //       component: () => import("@/views/test"),
+  //       name: "Test",
+  //       meta: { title: "我的测试" },
+  //     },
+  //   ],
+  // },
 
   {
     path: "/search",
