@@ -80,7 +80,7 @@ export const constantRoutes = [
     children: [
       {
         path: "/complex-search",
-        component: () => import("@/views/complex_search/complex_search"),
+        component: () => import("@/views/complex_search/index"),
         meta: { title: "组合查询" },
       },
       {
