@@ -122,16 +122,29 @@
               style="width: 100%"
               height="400"
             >
-              <el-table-column prop="name" label="姓名" width="95" />
-              <el-table-column prop="times" label="合作次数" width="95" />
-              <el-table-column prop="title" label="合作电影" width="185">
+              <el-table-column prop="name" label="姓名" width="100" />
+              <el-table-column prop="times" label="合作次数" width="100" />
+              <el-table-column prop="title" label="合作电影" width="250">
                 <template slot-scope="scope">
                   <div v-for="(item, index) in scope.row.title" :key="index">
                     {{ item }}
                   </div>
                 </template>
               </el-table-column>
+              <!-- <div slot="empty" style="text-align: left;">
+                <el-empty :image-size="100" description="裂开"></el-empty>
+              </div> -->
             </el-table>
+            <el-row style="text-align: center; margin-top: 20px">
+              <el-pagination
+                layout="prev, pager, next, jumper"
+                :current-page.sync="currentPage"
+                :page-size="5"
+                :page-count="totalPage"
+                @current-change="getNewPage(form)"
+                small
+              />
+            </el-row>
           </el-tab-pane>
           <el-tab-pane label="速度对比" name="speed">
             <div id="speed" style="width: 400px; height: 400px"></div>
@@ -168,6 +181,8 @@ export default {
         name: "",
         times: 0,
       },
+      currentPage:1,
+      totalPage:0,
     };
   },
 
@@ -253,13 +268,13 @@ export default {
     },
 
     search(form) {
-      this.isLoading = true;
       //判断是否有值为空
       if (form.name == "") {
         this.$message.warning("请输入姓名!");
       } else if (form.source == "director" && form.target == "director") {
         this.$message.warning("关系来源和合作对象不能同时为导演!");
       } else {
+        this.isLoading = true;
         //mysql查询总数
         this.$axios
           .post("/mysql/count/relation", {
@@ -268,10 +283,11 @@ export default {
             name: form.name,
             times: form.times,
             page: 1,
-            per_page: 3,
+            per_page: 5,
           })
           .then((res) => {
             console.log("pages", res.pages);
+            this.totalPage=res.pages;
           })
           .catch((err) => {
             this.$message.error("当前mysql网络异常，请稍后再试");
@@ -285,12 +301,12 @@ export default {
             name: form.name,
             times: form.times,
             page: 1,
-            per_page: 3,
+            per_page: 5,
           })
           .then((res) => {
             console.log(res);
             this.result = res.data;
-            console.log(this.result);
+            console.log("mysql结果",this.result);
             this.mysql_speed = res.consuming_time;
             this.isLoading = false;
           })
@@ -306,7 +322,7 @@ export default {
             name: form.name,
             times: form.times,
             page: 1,
-            per_page: 3,
+            per_page: 5,
           })
           .then((res) => {
             console.log(res);
@@ -324,7 +340,7 @@ export default {
             name: form.name,
             times: form.times,
             page: 1,
-            per_page: 3,
+            per_page: 5,
           })
           .then((res) => {
             console.log(res);
@@ -334,6 +350,28 @@ export default {
             this.$message.error("当前spark网络异常，请稍后再试");
           });
       }
+    },
+
+    getNewPage(form){
+      this.isLoading=true;
+      //mysql关系查询
+      this.$axios.post("/mysql/comprehensive/relation", {
+          source: form.source,
+          target: form.target,
+          name: form.name,
+          times: form.times,
+          page: this.currentPage,
+          per_page: 5,
+        })
+        .then((res) => {
+          console.log(res);
+          this.result = res.data;
+          console.log(this.result);
+          this.isLoading = false;
+        })
+        .catch((err) => {
+          this.$message.error("当前mysql网络异常，请稍后再试");
+        });
     },
 
     echartsInit() {

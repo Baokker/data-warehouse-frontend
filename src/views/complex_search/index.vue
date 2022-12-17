@@ -274,13 +274,16 @@
                   </div>
                 </template>
               </el-table-column>
+              <!-- <div slot="empty" style="text-align: left;">
+                <el-empty description="五育。"></el-empty>
+              </div> -->
             </el-table>
             <el-row style="text-align: center; margin-top: 20px">
               <el-pagination
                 layout="prev, pager, next, jumper"
-                :current-page="currentPage"
+                :current-page.sync="currentPage"
                 :page-size="10"
-                :total="totalNum"
+                :page-count="totalPage"
                 @current-change="getNewPage(form)"
                 small
               />
@@ -305,7 +308,7 @@ export default {
     return {
       activeName: "search_res",
       isLoading: false,
-      totalNum: 0,
+      totalPage: 0,
       currentPage: 1,
       mysql_speed: 0,
       spark_speed: 0,
@@ -464,10 +467,11 @@ export default {
     },
 
     search(form) {
-      this.isLoading = true;
       if (form.columns.length == 0) {
         this.$message.warning("请至少输入一个条件!");
       } else {
+        this.isLoading = true;
+        
         //判断年份是否为空
         if (form.year == 1930) {
           console.log("year为空");
@@ -518,28 +522,6 @@ export default {
           );
         }
 
-        // //调用mysql查询电影总数
-        // this.$axios.post("mysql/count/movie", {
-        //     genre_name:form.genre,
-        //     min_score:form.min_score,
-        //     max_score:form.max_score,
-        //     title:form.title,
-        //     director:form.director,
-        //     actor:form.actor,
-        //     year:form.year,
-        //     month:form.month,
-        //     season:form.season,
-        //     weekday:form.weekday,
-        //     day:form.day,
-        //     page:1,
-        //     per_page:10,
-        // }).then(res => {
-        //   console.log("mysql总数",res.pages);
-        //   this.isLoading=false;
-        // }).catch(err => {
-        //   this.$message.error('当前mysql网络异常，请稍后再试');
-        // });
-
         //调用mysql查询总数
         this.$axios
           .post("/mysql/count/movie", {
@@ -559,6 +541,7 @@ export default {
           })
           .then((res) => {
             console.log("pages:", res.pages);
+            this.totalPage=res.pages;
           });
 
         //调用mysql查询
@@ -619,7 +602,6 @@ export default {
           })
           .then((res) => {
             console.log("这是spark的结果", res);
-            this.totalNum = res.count;
             this.spark_speed = res.consuming_time;
           })
           .catch((err) => {
@@ -629,6 +611,7 @@ export default {
     },
 
     getNewPage(form) {
+      //分页获取数据
       console.log("切换页面");
       console.log("当前页数", this.currentPage);
       this.isLoading = true;
