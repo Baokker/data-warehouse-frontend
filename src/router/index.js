@@ -52,7 +52,7 @@ export const constantRoutes = [
         path: "dashboard",
         name: "Dashboard",
         component: () => import("@/views/dashboard/index"),
-        meta: { title: "Dashboard", icon: "dashboard" },
+        meta: { title: "介绍", icon: "dashboard" },
       },
     ],
   },
@@ -75,7 +75,7 @@ export const constantRoutes = [
   {
     path: "/search",
     component: Layout,
-    meta: { title: "查询" },
+    meta: { title: "查询", icon: "search" },
     redirect: "/search/complex-search",
     children: [
       {

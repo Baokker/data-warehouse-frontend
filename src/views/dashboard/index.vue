@@ -1,30 +1,185 @@
 <template>
-  <div class="dashboard-container">
-    <div class="dashboard-text">name: {{ name }}</div>
-  </div>
+  <el-main>
+    <el-card style="margin: 30px">
+      <h1 id="项目简介">项目简介</h1>
+      <p>
+        本项目以亚马逊电影评论数据集作为数据基础，针对电影及其周边信息，建立基于关系型数据库（MySQL）、分布式文件型数据仓库系统（Hive+Spark），和图数据库（Neo4j）的数据仓库系统，构建数据治理体系，并针对特定业务需求优化存储模型，定制化数据聚合，进而实现了高效率的综合条件查询，合作关系查询和数据统计，系统性能对比等业务功能。
+      </p>
+      </el-card>
+    <el-card style="margin: 30px">
+
+      <h1 id="功能列表">功能列表</h1>
+      <ol>
+        <li>
+          <p>查询电影信息</p>
+          <ul>
+            <li>
+              <p>提供的筛选条件字段：</p>
+              <table>
+                <thead>
+                  <tr>
+                    <td>电影标题</td>
+                    <td>title</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>上映日期</td>
+                    <td>year、month、day、season、weekday</td>
+                  </tr>
+                  <tr>
+                    <td>导演</td>
+                    <td>director</td>
+                  </tr>
+                  <tr>
+                    <td>演员</td>
+                    <td>actor</td>
+                  </tr>
+                  <tr>
+                    <td>风格</td>
+                    <td>genre_name</td>
+                  </tr>
+                  <tr>
+                    <td>评分</td>
+                    <td>min_score、max_score</td>
+                  </tr>
+                </tbody>
+              </table>
+            </li>
+            <li>
+              <p>
+                上述字段参数都 <strong>可空</strong>，若空则表示不作为筛选条件。
+              </p>
+              <p>可选的电影信息字段：</p>
+              <table>
+                <thead>
+                  <tr>
+                    <td>电影asin</td>
+                    <td>asin</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>电影标题</td>
+                    <td>title</td>
+                  </tr>
+                  <tr>
+                    <td>电影版本数</td>
+                    <td>edition</td>
+                  </tr>
+                  <tr>
+                    <td>电影版本</td>
+                    <td>format</td>
+                  </tr>
+                  <tr>
+                    <td>电影风格</td>
+                    <td>genre_name</td>
+                  </tr>
+                  <tr>
+                    <td>电影评分</td>
+                    <td>score</td>
+                  </tr>
+                  <tr>
+                    <td>上映日期</td>
+                    <td>date</td>
+                  </tr>
+                  <tr>
+                    <td>导演</td>
+                    <td>directors</td>
+                  </tr>
+                  <tr>
+                    <td>演员</td>
+                    <td>actors</td>
+                  </tr>
+                </tbody>
+              </table>
+            </li>
+          </ul>
+          <p>
+            上述字段都可选，并且若某一部电影有多个字段信息（如演员）则返回列表。
+          </p>
+          <ul>
+            <li>
+              通过该综合查询的接口，我们实现了根据多重字段筛选电影、并返回电影不同信息的接口。
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p>查询合作关系</p>
+          <ul>
+            <li>
+              <p>查询与演员经常合作的导演</p>
+            </li>
+            <li>
+              <p>查询与导演经常合作的演员</p>
+            </li>
+            <li>
+              <p>查询与演员经常合作的演员</p>
+            </li>
+          </ul>
+          <table>
+            <thead>
+              <tr>
+                <td>source</td>
+                <td>actor或director</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>target</td>
+                <td>actor或director</td>
+              </tr>
+              <tr>
+                <td>name</td>
+                <td>人名</td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+      </ol>
+      </el-card>
+    <el-card style="margin: 30px">
+
+      <h1 id="数据血缘">数据血缘</h1>
+      <p>数据血缘的使用场景</p>
+      <ol>
+        <li>保证报告数据的完整性</li>
+      <p>
+        开发人员可以通过检查数据血缘链中的每个节点，追溯异常数据元素的血缘，以确认数据的计算处理方式，并分析与该异常数据有交互的业务用户行为，实现异常数据元素的排查，确认数据变更影响的下游数据对象，保证数据的完整性。
+      </p>
+        <li>提升调度性能</li>
+      <p>
+        通过收集调度任务的开始结束时间，了解关键任务ETL链路的时间瓶颈，再根据JOB任务的执行情况，定位到性能瓶颈通过调整任务的优先级，保证任务的资源提供，提升整条ETL链路的执行效率。
+      </p>
+        <li>追踪个人信息，控制传播范围</li>
+      <p>
+        数据血缘可以将追踪个人信息扩展到数据报告层和数据库层，如果将报表中的特定数据元素进行标识，则能够在涉及该数据元素的所有血缘路径中找到标识元素所在列，并使用数据血缘工具控制数据传播范围。
+      </p>
+        <li>给表和字段打标签</li>
+      <p>
+        通过血缘分析，对整条链路打上标签，比如业务数据、广告、订单之类，也可以打上优先级重要程度的标签。
+      </p>
+      </ol>
+      </el-card>
+    <el-card style="margin: 30px">
+
+      <h1 id="溯源查询">溯源查询</h1>
+      <ul>
+        <li>
+          在过程中，我们找出了多少非电影的数据？
+          我们一共爬取了233131条产品数据，其中筛选了80660条非电影数据，获得了152471条电影数据，最终合并得到83921部电影的数据
+        </li>
+        <li>
+          哈利波特相关问题
+          共找到25部哈利波特系列电影，相关ASIN见第六列（显示不完全）
+        </li>
+      </ul>
+    </el-card>
+  </el-main>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-
 export default {
-  name: 'Dashboard',
-  computed: {
-    ...mapGetters([
-      'name'
-    ])
-  }
-}
+  name: "Dashboard",
+};
 </script>
-
-<style lang="scss" scoped>
-.dashboard {
-  &-container {
-    margin: 30px;
-  }
-  &-text {
-    font-size: 30px;
-    line-height: 46px;
-  }
-}
-</style>
