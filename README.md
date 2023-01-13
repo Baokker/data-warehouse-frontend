@@ -1,3 +1,23 @@
+# Introduction
+
+本项目为2022年秋数据仓库课程项目的子项目之一，通过前端网页显示查询数据及速度对比。
+
+主要是在utils中封装了一个数据查询专用的axios服务，以避免和原项目的axios服务相冲突，并在views中通过e-charts等实现了可视化的显示。
+
+另外原项目vue-admin-template非常具有参考意义，也欢迎大家学习。
+
+以下为原项目的README。
+
+This project is one of the sub-projects of the data warehouse course project in the fall of 2022. It displays query data and speed comparison through the front-end webpage.
+
+The main reason is to encapsulate an axios service dedicated to data query in utils to avoid conflicts with the axios service of the original project, and to realize visual display through e-charts in views.
+
+In addition, the original project vue-admin-template is very informative, and everyone is welcome to learn.
+
+The following is the README of the original project.
+
+---
+
 # vue-admin-template
 
 English | [简体中文](./README-zh.md)
